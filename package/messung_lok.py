@@ -10,13 +10,15 @@ import pandas as pd
 import numpy as np
 
 
-def iter_func(messung: int, key: str):
+def iter_func(messung: int, key: str, plot=True):
     messungs_ordner = Path("D:\\Baumessungen\\Durchlass_Bichlbach\\messungen_03_06_2022\\")
     file_paths = messungs_ordner.glob(f'*Zug{messung}.XLSB')
 
     for file_path in file_paths:
         print(file_path)
         df = util_io.rd_messungen_03_06_2022(file_path)
+
+        df = df.rolling(window=30, center=True).mean()
 
         if 'fahrt_20_ibk' in key:
             trigger = df['Gleis [Pa]'][df['Gleis [Pa]'] > 10000].index[0]
@@ -54,22 +56,28 @@ def iter_func(messung: int, key: str):
         pe_gleis = 22.5
         pe_wand = 9.2
 
-        print('Maximal, Gleis: ', np.nanmax(y_gleis) / 1000 + pe_gleis)
-        print('Maximal, Wand: ', np.nanmax(y_wand) / 1000+pe_wand)
+        max_gleis = np.nanmax(y_gleis) / 1000 + pe_gleis
+        max_wand = np.nanmax(y_wand) / 1000 + pe_wand
+
+        print('Maximal, Gleis: ', max_gleis)
+        print('Maximal, Wand: ', max_wand)
         # print('Gleis/Wand: ', np.nanmax(y_gleis) / np.nanmax(y_wand))
 
-        f, ax1, ax2 = plotting.plot_2_values(x_plot, y_wand / 1000, y_gleis / 1000, figsize=[10, 3])
-        ax1.set_ylabel('p (Wand) (kPa)')
-        ax2.set_ylabel('p (Gleis) (kPa)')
-        ax1.set_xlabel('t (s)')
-        ax1.set_xlim(x_range)
-        # ax1.set_ylim(y1_range)
-        # ax2.set_ylim(y2_range)
-        f.canvas.manager.set_window_title(f'{key}_zug{messung}')
-        plt.tight_layout()
-        plt.show()
+        if plot:
+            f, ax1, ax2 = plotting.plot_2_values(x_plot, y_wand / 1000, y_gleis / 1000, figsize=[10, 3])
+            ax1.set_ylabel('p (Wand) (kPa)')
+            ax2.set_ylabel('p (Gleis) (kPa)')
+            ax1.set_xlabel('t (s)')
+            ax1.set_xlim(x_range)
+            # ax1.set_ylim(y1_range)
+            # ax2.set_ylim(y2_range)
+            f.canvas.manager.set_window_title(f'{key}_zug{messung}')
+            plt.tight_layout()
+            plt.show()
         # plt.savefig(Path(r"D:\Baumessungen\Durchlass_Bichlbach\messkurven_lok") / f'{key}_zug{messung}.png')
         # plt.close()
+
+        return [max_gleis, max_wand]
 
 
 def main():
@@ -89,10 +97,23 @@ def main():
                     'aufstellung_reutte': [4, 11, 25]
 
                     }
-    for key, mess_gruppe in list(mess_gruppen.items())[-2:]:
+    max_df = pd.DataFrame()
+    for key, mess_gruppe in list(mess_gruppen.items()):
         print(key, mess_gruppe)
+        max_array = []
         for messung in mess_gruppe:
-            iter_func(messung, key)
+            max_array.append(iter_func(messung, key, plot=False))
+
+        max_array = np.array(max_array)
+        print('Max Messreihe Gleis und Wand:')
+        max_messreihe = np.max(max_array, axis=0)
+        s = pd.Series(data=max_messreihe, index=['Max.Gleis', 'Max.Wand'], name=key)
+
+        max_df = pd.concat((max_df, s), axis=1)
+
+    max_df = max_df.T
+    max_df.to_excel(Path("D:\\Baumessungen\\Durchlass_Bichlbach\\analyse_lok\\smoothed_maxima.xlsx"))
+    print(max_df)
 
 
 if __name__ == '__main__':
