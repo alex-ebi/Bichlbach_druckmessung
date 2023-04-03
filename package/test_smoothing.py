@@ -1,6 +1,7 @@
 from pathlib import Path
 import util_io
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 
 def main():
@@ -9,9 +10,13 @@ def main():
     print(df)
 
     df_sm = df.rolling(window=30, center=True).mean()
+    mpl.rcParams.update({'font.size': 15})
 
-    plt.plot(df['Gleis [Pa]'], 'r--')
-    plt.plot(df_sm['Gleis [Pa]'])
+    plt.plot(df['Gleis [Pa]'] * .001, 'r--')
+    plt.plot(df_sm['Gleis [Pa]'] * .001, 'k')
+    plt.ylabel('p (kPa)')
+    plt.xlabel('t (s)')
+    plt.tight_layout()
     plt.show()
 
 
