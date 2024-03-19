@@ -3,12 +3,13 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib as mpl
+import paths
 
 mpl.rcParams.update({'font.size': 15})
 
 
 def main():
-    excel_path = Path("D:\\Baumessungen\\Durchlass_Bichlbach\\analyse_lok\\smoothed_maxima.xlsx")
+    excel_path = paths.data_path / "analyse_lok/smoothed_maxima.xlsx"
 
     df = pd.read_excel(excel_path, index_col=0)
 

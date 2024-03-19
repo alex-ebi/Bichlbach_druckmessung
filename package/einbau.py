@@ -4,19 +4,20 @@ import os
 import numpy as np
 from matplotlib import pyplot as plt
 import functions
+import paths
 
 
 def collect_file_paths(parent_folder: str) -> np.array:
     file_list = os.listdir(parent_folder)
 
     for i in range(len(file_list)):
-        file_list[i] = parent_folder + file_list[i]
+        file_list[i] = parent_folder / file_list[i]
 
     return file_list
 
 
 def main():
-    messungs_ordner = "D:\\Baumessungen\\Durchlass_Bichlbach\\messungen_einbau\\"
+    messungs_ordner = paths.data_path / 'messungen_einbau'
     file_paths = collect_file_paths(messungs_ordner)
 
     for file_path in file_paths[-4:]:

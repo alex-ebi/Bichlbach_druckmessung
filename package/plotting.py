@@ -18,12 +18,12 @@ def set_temp_interval(ax: plt.Axes, interval_size=1.2, y_min=None):
     """
     if not y_min:
         y_min, _ = ax.get_ylim()
-        y_min -= interval_size*.03
+        y_min -= interval_size * .03
     ax.set_ylim(y_min, y_min + interval_size)
 
 
 def plot_2_values(x: np.array, y1: np.array, y2: np.array, xlabel="t(s)", y1label="Druck(Pa)", y2label="T(Ohm)"
-                  , figsize=[10, 5]):
+                  , figsize=None):
     """
     Plots 2 y values, both in relation to the value x.
     Parameters
@@ -42,6 +42,8 @@ def plot_2_values(x: np.array, y1: np.array, y2: np.array, xlabel="t(s)", y1labe
     plt.Axis : ax1 of y1 values
     plt.Axis : ax2 of y2 values
     """
+    if figsize is None:
+        figsize = (10, 5)
     mpl.rcParams.update({'font.size': 15})
 
     f, ax1 = plt.subplots(figsize=figsize)
@@ -57,6 +59,6 @@ def plot_2_values(x: np.array, y1: np.array, y2: np.array, xlabel="t(s)", y1labe
     ax2.set_ylabel(y2label, color=color)
     ax2.plot(x, y2, color=color)
 
-    ax1.grid(True)
+    ax1.grid()
 
     return f, ax1, ax2
