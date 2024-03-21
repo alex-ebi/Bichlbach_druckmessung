@@ -9,18 +9,19 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib as mpl
+import paths
 
 mpl.rcParams.update({'font.size': 15})
 
 
-def iter_func(messung: int, key: str, ax1, ax2, plot=True):
-    messungs_ordner = Path("D:\\Baumessungen\\Durchlass_Bichlbach\\messungen_03_06_2022\\")
+def iter_func(messung: int, key: str, ax1, ax2, messungs_ordner, plot=True):
     file_paths = messungs_ordner.glob(f'*Zug{messung}.XLSB')
 
     for file_path in file_paths:
         print(file_path)
         df = util_io.rd_messungen_03_06_2022(file_path)
 
+        # smoothing
         df = df.rolling(window=30, center=True).mean()
         x_range = [-6, 8]
 
@@ -58,7 +59,7 @@ def iter_func(messung: int, key: str, ax1, ax2, plot=True):
         y_gleis = plot_df.loc[:, 'Gleis [Pa]'] - np.min(plot_df.loc[:, 'Gleis [Pa]'])
 
         pe_gleis = 22.5
-        pe_wand = 9.2
+        pe_wand = 11.7
 
         max_gleis = np.nanmax(y_gleis) / 1000 + pe_gleis
         max_wand = np.nanmax(y_wand) / 1000 + pe_wand
@@ -88,16 +89,16 @@ def iter_func(messung: int, key: str, ax1, ax2, plot=True):
 
 
 def main():
-    messungs_ordner = Path("D:\\Baumessungen\\Durchlass_Bichlbach\\messungen_03_06_2022\\")
+    messungs_ordner = paths.data_path / "messungen_03_06_2022"
 
     mess_gruppen = {'fahrt_20_ibk': [8, 14, 22, 28],
                     'fahrt_20_reutte': [7, 15, 21, 29],
                     'fahrt_40_ibk': [2, 10, 16, 24],
                     'fahrt_40_reutte': [1, 9, 17, 23],
                     }
-    mess_gruppen = {'fahrt_20_ibk': [8, 14, 22, 28],
-                    'fahrt_40_ibk': [2, 10, 16, 24],
-                    }
+    # mess_gruppen = {'fahrt_20_ibk': [8, 14, 22, 28],
+    #                 'fahrt_40_ibk': [2, 10, 16, 24],
+    #                 }
     # mess_gruppen = {'fahrt_20_ibk': [8],
     #                 'fahrt_40_ibk': [2],
     #                 }
@@ -112,7 +113,7 @@ def main():
         print(key, mess_gruppe)
         max_array = []
         for messung in mess_gruppe:
-            max_array.append(iter_func(messung, key, ax1, ax2, plot=True))
+            max_array.append(iter_func(messung, key, ax1, ax2, messungs_ordner, plot=True))
 
         max_array = np.array(max_array)
         print('Max Messreihe Gleis und Wand:')
@@ -125,7 +126,7 @@ def main():
     plt.tight_layout()
     plt.show()
     max_df = max_df.T
-    max_df.to_excel(Path("D:\\Baumessungen\\Durchlass_Bichlbach\\analyse_lok\\smoothed_maxima.xlsx"))
+    max_df.to_excel(paths.data_path / 'analyse_lok/smoothed_maxima.xlsx')
     print(max_df)
 
 

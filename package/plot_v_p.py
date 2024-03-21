@@ -1,4 +1,4 @@
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 from pathlib import Path
 import pandas as pd
 import numpy as np
@@ -36,11 +36,12 @@ def main():
     plt.ylabel('Druck (kPa)')
     plt.scatter(x, y, color='k')
 
-    # plt.plot(x, f_plot(x), 'k')
-    #
+    plt.plot(x, f_plot(x), 'k')
+
     # ax.text(0.05, 0.95, f'Steigung Fit: {np.round(f[0], 2):.2f} kPa/(km/h)', transform=ax.transAxes, bbox=props,
     #         verticalalignment='top')
     plt.tight_layout()
+    plt.savefig(paths.data_path / 'analyse_lok' / f'p_v_lok.png')
     plt.show()
 
 
