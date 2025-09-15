@@ -7,22 +7,20 @@ import functions
 import paths
 
 
-def collect_file_paths(parent_folder: str) -> np.array:
-    file_list = os.listdir(parent_folder)
-
-    for i in range(len(file_list)):
-        file_list[i] = parent_folder / file_list[i]
-
-    return file_list
-
-
 def main():
     messungs_ordner = paths.wattens_path / 'messungen_einbau'
-    file_paths = collect_file_paths(messungs_ordner)
+    file_paths = messungs_ordner.glob('*.xlsb')
+    file_paths = [item for item in file_paths if not item.name.startswith('~')]
+    plot_path = paths.wattens_path / 'plots_einbau'
+    plot_path.mkdir(exist_ok=True)
 
     for file_path in file_paths:
         df = util_io.rd_messungen_wattens_2024(file_path)
-        print(df)
+        print(file_path)
+
+        if 'Schotter 2.xlsb' in file_path.name:
+            df = df.loc[0:310]
+
         temp = functions.resistance_temp(df["1 Temp [Ohm]"])
         f, ax1, ax2 = plotting.plot_2_values(df.index, df["1 [Pa]"] * .001, temp,
                                              y2label=r"T($^\circ$C)", y1label="p(kPa)")
@@ -36,12 +34,13 @@ def main():
 
         delta_t = temp.iloc[-1] - temp.iloc[0]
 
-        plt.figtext(.125, .9, str(file_path)[53:-5] + ": 1" + r", $\Delta p = %.1f\,$kPa, $\Delta T = %.1f\,^\circ$C" %
+        plt.figtext(.125, .9, file_path.name.replace('.XLSB','').replace('.xlsb','') + ": 1" + r", $\Delta p = %.1f\,$kPa, $\Delta T = %.2f\,^\circ$C" %
                     (delta_p, delta_t))
 
         plotting.set_temp_interval(ax2)  # , interval_size=3.6)
-
-        plt.show()
+        plt.savefig(plot_path / file_path.name.replace('.xlsb', '_1.png').replace('.XLSB', '_1.png'))
+        plt.close()
+        # plt.show()
 
         temp = functions.resistance_temp(df["2 Temp [Ohm]"])
         f, ax1, ax2 = plotting.plot_2_values(df.index, df["2 [Pa]"] * .001, temp,
@@ -55,12 +54,14 @@ def main():
         delta_p = p_end - p_init
         delta_t = temp.iloc[-1] - temp.iloc[0]
 
-        plt.figtext(.15, .9, str(file_path)[53:-5] + ": 2" + r", $\Delta p = %.1f\,$kPa, $\Delta T = %.1f\,^\circ$C" %
+        plt.figtext(.15, .9, file_path.name.replace('.XLSB','').replace('.xlsb','') + ": 2" + r", $\Delta p = %.1f\,$kPa, $\Delta T = %.2f\,^\circ$C" %
                     (delta_p, delta_t))
 
         plotting.set_temp_interval(ax2)  # , interval_size=10, y_min=11)
-
-        plt.show()
+        print(file_path.name.replace('.xlsb', '.png'))
+        plt.savefig(plot_path / file_path.name.replace('.xlsb', '_2.png').replace('.XLSB', '_2.png'))
+        # plt.show()
+        plt.close()
 
 
 if __name__ == '__main__':

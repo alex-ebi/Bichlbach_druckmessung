@@ -1,4 +1,5 @@
 /venv/
+/.venv/
 /package/paths.py
 /__pycache__/
 /package/__pycache__/
