@@ -1,4 +1,5 @@
 import pandas as pd
+import pyxlsb
 
 
 def rd_messungen(file_path: str, return_header=False) -> pd.DataFrame:
@@ -26,7 +27,7 @@ def rd_messungen(file_path: str, return_header=False) -> pd.DataFrame:
 
 def rd_messungen_03_06_2022(file_path, return_header=False) -> pd.DataFrame:
     """
-    Liest Excel file von Messungen und gibt sie als np.array aus.
+    Liest Excel file von Messungen und gibt sie als pd.DataFrame aus.
 
     Parameters
     ----------
@@ -50,7 +51,7 @@ def rd_messungen_03_06_2022(file_path, return_header=False) -> pd.DataFrame:
 
 def rd_messungen_wattens_2024(file_path) -> pd.DataFrame:
     """
-    Liest Excel file von Messungen und gibt sie als np.array aus.
+    Liest Excel file von Messungen und gibt sie als pd.DataFrame aus.
 
     Parameters
     ----------
@@ -70,3 +71,20 @@ def rd_messungen_wattens_2024(file_path) -> pd.DataFrame:
     col_names = ['1 [Pa]', '1 Temp [Ohm]', '2 [Pa]', '2 Temp [Ohm]']
     df = pd.read_excel(file_path, index_col=0, engine='pyxlsb', skiprows=49, header=None, names=col_names)
     return df
+
+
+def read_dms(file_path) -> pd.DataFrame:
+    col_names = ['DMS_1 [um/m]', 'DMS_2 [um/m]']
+    df = pd.read_excel(file_path, index_col=0, engine='pyxlsb', skiprows=49, header=None, names=col_names)
+
+    # wb_obj = pyxlsb.open_workbook(file_path)
+    # sheet = wb_obj.get_sheet(1)
+
+    # cell = list(sheet.rows())[4][]
+    # print(row)
+    # sheet_obj = wb_obj.active  ## Or use sheet_obj = wb_obj['Sheet1'] if you know sheet name
+
+    # val = sheet_obj.cell(row = 5, column = 0).value 
+    # print(val)
+    return df
+
