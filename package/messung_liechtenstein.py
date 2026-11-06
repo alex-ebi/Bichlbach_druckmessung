@@ -14,6 +14,9 @@ def main():
     plot_ordner = messungs_ordner / 'plots'
     file_paths = messungs_ordner.glob('*.xlsb')
 
+    if plot_ordner.exists() is False:
+        plot_ordner.mkdir()
+
     for file_path in file_paths:
         print(file_path)
         df = util_io.read_dms(file_path)
@@ -41,6 +44,15 @@ def main():
         plt.savefig(plot_ordner / (file_path.name.replace('.xlsb', '') + '_smooth.png'))
         plt.close()
         # plt.show()
+
+        f, ax = plt.subplots(figsize=[15, 5])
+        ax.plot(smooth_1[0], smooth_1[1], label='DMS 1 [um/m]')
+        ax.plot(smooth_2[0], smooth_2[1], label='DMS 2 [um/m]')
+        ax.set_xlabel('t (s)')
+        ax.set_ylabel('DMS [um/m]')
+        plt.legend()
+        plt.show()
+        
 
 
 if __name__ == '__main__':

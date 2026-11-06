@@ -1,3 +1,6 @@
+from html import parser
+from dateutil import parser as dateparser
+
 import pandas as pd
 import pyxlsb
 
@@ -77,14 +80,19 @@ def read_dms(file_path) -> pd.DataFrame:
     col_names = ['DMS_1 [um/m]', 'DMS_2 [um/m]']
     df = pd.read_excel(file_path, index_col=0, engine='pyxlsb', skiprows=49, header=None, names=col_names)
 
+    df = -df  # invert values
+
     # wb_obj = pyxlsb.open_workbook(file_path)
     # sheet = wb_obj.get_sheet(1)
 
-    # cell = list(sheet.rows())[4][]
-    # print(row)
-    # sheet_obj = wb_obj.active  ## Or use sheet_obj = wb_obj['Sheet1'] if you know sheet name
+    # cell = list(sheet.rows())[4][0].v
+    # print(cell)
 
-    # val = sheet_obj.cell(row = 5, column = 0).value 
-    # print(val)
+    # dt = dateparser.parse(cell)
+
+    # print(dt)
+    # df.index = df.index + dt
+
+
     return df
 
